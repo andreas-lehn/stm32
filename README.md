@@ -4,9 +4,8 @@ STM32 Microcontroller Projects
 STM32 devices are amazing: They are cheap and powerful.
 They use state-of-the-art Cortex-M processors which makes it fun to program them.
 
-In this repository are a collection of projects that I have done with STM32 board.
-My favorite board - because it is so cheap and powerful - is the Nucleo 32 with an STM32F103C
-8Tx device.
+In this repository are a collection of projects that I have done with STM32 boards.
+My favorite board - because it is so cheap and powerful - is the Nucleo 32 with an STM32F103C8Tx device.
 
 
 Development Approach
@@ -15,12 +14,12 @@ Development Approach
 I like simplistic approaches and so my goal is to keep my projects as simple as possible and understandable.
 Embedded software is often a mess: Spaghetti code with a lot of global variables.
 Basic and fundamental software design techniques are often ignored.
-That leads to very buggy and hard to maintain software.
-My goal is to do that better and my projects shall inspire you to do it better also.
+That leads buggy, slow and very hard to maintain software.
+My goal is to do it better and my projects shall inspire you to do it better also.
 
 STM delivers an IDE called _STM32CubeIDE_ which includes a code generator called _STM32CubeMX_.
 With that IDE you can configure graphically your STM32.
-It than generates code to which you must added your code called _user code_.
+It than generates code to which you must added your own code called _user code_.
 This is already a starting point for a big mess!
 I tried it out an recognize, that a regeneration of the code overwrites my own code.
 That's a no go!
@@ -28,7 +27,7 @@ That's a no go!
 Additionally STM deliveres a software library called _Hardware Abstraction Layer_ (HAL).
 This Layer should ease the access to the devices.
 Because it adds an additional layer between you and your hardware it increases complexitiy
-and makes your projects less understandible and error prone.
+and makes your projects less understandable and error prone.
 
 I am convinced that if you want to understand what is going on in an embedded system
 you have to understand the hardware you are running on and the software you are writing or using.
@@ -49,7 +48,6 @@ and they start a GDB server to debug the software on the device remotely.
 When it comes to debugging an IDE is of help.
 Because every tools I use in the development of the STM32 software are very common
 there are a bunch of tools and IDEs useable on top of the basic toolchain.
-
 I use _Visual Studio Code_ for editing and debugging.
 All the tools mentioned above are very well integrated in VSCode.
 And most important: It does nothing under the hood.
@@ -75,11 +73,12 @@ Dynamic Architecture
 Because a mircro controller has to react timely the design approach is different to classical IT software.
 In a command line tool there is a `main` function that reads some input, performs a function,
 makes some output and exits.
-In an application with a graphical user interface callback function are called whenever the user does something of relevance.
+In an application with a graphical user interface callback functions are called from the system
+whenever the user does something of relevance.
 These callback functions react to the user input a perform some tasks.
 
 An embedded system is designed differently:
-It has a hart beat and executes cyclically at every beat the same software all the time.
+It has a heart beat and executes cyclically at every beat the same software all the times.
 This is called _Rate Monotonic Scheduling_.
 Sometimes _Multi Rate Monotonic Scheduling_ is used, but that is a detail.
 
@@ -95,19 +94,19 @@ and is often determined by the dynamics of the technical process that has to be 
 The `main` function can be written very generic and can then be reused in all projects.
 The application specific code has to implement three functions:
 1. `setup`: This is the first function that is called by `main`.
-   Its purpose is to set up the board an configure als the peripherals.
+   Its purpose is to set up the board an configure all the peripherals.
    At the end the board is useable for the application specific code.
 2. `init`: This function has to initialize the application.
    It is called before the first step and after the setup of the hardware.
    So it can use the hardware already when executing the initialisation code.
-   `init` returns the heart beats per second.
-   With this frequency the `step` function is called.
+   `init` returns the requiered heart beats per second for the step function to main.
 3. `step` is called cyclically when ever a heart beat occurs.
-   It should finish inside the heart beat.
+   The frequency is determined by the `init` function.
+   `step` should finish inside the duration between heart beat.
    Otherwise some heart beats are missed.
 
 This is the dynamic structure of all my programms.
-It scheduling is more advanced a scheduler can be triggered by `step`.
+If scheduling is more advanced a scheduler can be triggered by `step`.
 The scheduler than executes pieces of the software as required.
 These pieces are often called _tasks_.
 
