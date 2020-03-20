@@ -5,8 +5,8 @@
  *      Author: andreas
  */
 
-#include "../app/app.h"
-#include "../app/board.h"
+#include "runtime/callback.h"
+#include "board/board.h"
 
 #define STEPS_PER_SECOND 1024
 #define DUTY              128

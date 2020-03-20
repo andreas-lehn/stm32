@@ -5,11 +5,11 @@
  *      Author: andreas
  */
 
-#include "../app/board.h"
+#include "board.h"
+#include "runtime/callback.h"
 
 #include <stm32f1xx.h>
 
-#include "../app/app.h"
 
 #define PIN13 (1 << 13)
 

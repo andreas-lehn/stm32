@@ -7,8 +7,8 @@
  *      Author: andreas
  */
 
-#ifndef APP_APP_H_
-#define APP_APP_H_
+#ifndef _RUNTIME_CALLBACK_H_
+#define _RUNTIME_CALLBACK_H_
 
 /*
  * Setup has to set up the board and configure all peripherals so that is is useable for the application.
@@ -29,4 +29,4 @@ unsigned init(void);
  */
 void step(int beat);
 
-#endif /* APP_APP_H_ */
+#endif /* _RUNTIME_CALLBACK_H_ */

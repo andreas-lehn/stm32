@@ -5,10 +5,10 @@
  *      Author: andreas
  */
 
-#ifndef APP_BOARD_H_
-#define APP_BOARD_H_
+#ifndef _BOARD_H_
+#define _BOARD_H_
 
 void led_on(void);
 void led_off(void);
 
-#endif /* APP_BOARD_H_ */
+#endif /* _BOARD_H_ */

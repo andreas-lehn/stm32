@@ -1,6 +1,6 @@
 #include <stm32f1xx.h>
 
-#include "../app/app.h"
+#include "callback.h"
 
 static unsigned volatile system_beat = 0;
 
