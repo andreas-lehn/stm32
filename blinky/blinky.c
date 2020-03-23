@@ -6,7 +6,7 @@
  */
 
 #include "runtime/hooks.h"
-#include "board/board.h"
+#include "board.h"
 
 #define STEPS_PER_SECOND 1024
 #define DUTY              800
