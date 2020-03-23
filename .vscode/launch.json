@@ -10,10 +10,10 @@
             "request": "launch",
             "program": "${workspaceFolder}/build/blinky.elf",
             "cwd": "${workspaceFolder}",
+            // "logging": { "engineLogging": true },
             "MIMode": "gdb",
             "miDebuggerServerAddress": "localhost:4242",
-            "miDebuggerPath": "/usr/local/bin/arm-none-eabi-gdb",
-            "logging": { "engineLogging": true }
+            "miDebuggerPath": "arm-none-eabi-gdb"
         }
     ]
 }
