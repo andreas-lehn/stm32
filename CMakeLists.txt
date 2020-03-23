@@ -8,28 +8,8 @@ include_directories(
 )
 
 add_compile_options(
-    -mcpu=cortex-m3     # specify the name of the target CPU
-    #-std=gnu11          # specifies gnu11 as c language dialect.
-    -g3                 # debug information level 3
-    -O0                 # No optimization (Optimization level 0)
-    -ffunction-sections # place each function
-    -fdata-sections     # or data item in its own section
     -Wall               # show all warnings
-    # -fstack-usage       # ?
-    -mfloat-abi=soft    # Specify if floating point hardware should be used.
-    -mthumb             #Generate code for Thumb state.
-)
-
-add_link_options(
-    # -specs=nano.specs  # use newlib instead of libc.
-    -T ${CMAKE_SOURCE_DIR}/STM32F103C8TX_FLASH.ld # linker script file
-    -static             # force static linking (no shared objects)
-    -mfloat-abi=soft    
-    -mthumb
-    #-lc                 # link library c
-    #-lm                 # link library m
-    #--gc-sections        # remove unused sections
-    -flto                # link time optimization
+    -std=gnu11          # specifies gnu11 as c language dialect.
 )
 
 add_executable(blinky.elf
@@ -42,14 +22,9 @@ add_executable(blinky.elf
     runtime/system_stm32f1xx.c
 )
 
+target_compile_definitions(blinky.elf PUBLIC STM32F103xB)
+
 target_link_options(blinky.elf PUBLIC
-    -specs=nosys.specs # use libnosys as libc.
-)
-
-target_include_directories(blinky.elf PUBLIC
-    
-)
-
-target_compile_definitions(blinky.elf PUBLIC
-    STM32F103xB
+    -specs=nosys.specs # use libnosys as libc
+    -T ${CMAKE_SOURCE_DIR}/runtime/STM32F103C8TX_FLASH.ld  # linker script file
 )
