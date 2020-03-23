@@ -6,7 +6,7 @@
  */
 
 #include "board.h"
-#include "runtime/callback.h"
+#include "runtime/hooks.h"
 
 #include <stm32f1xx.h>
 
@@ -18,13 +18,11 @@
  */
 void setup(void)  {
 
-#ifndef NDEBUG
 	/*
 	 * IO-Port A is needed for debugging and flashing.
 	 * So turn it on if debugging is wanted.
 	 */
     RCC->APB2ENR |= RCC_APB2ENR_IOPAEN;
-#endif
 
     /*
      * PIN 13 of IO-Port C is connected to the board internal LED.

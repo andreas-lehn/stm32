@@ -151,3 +151,40 @@ But it is independent of the hardware.
 That means, it does not include any `stm32f1xx` headers.
 It can be compiled, unit tested and executed on the host system.
 To execute it, a stub or mock for the board module must be written.
+
+
+Compiling the Software
+----------------------
+
+To compile the software you need some tools installed on your system.
+The first one is the `arm-none-eabi-gcc` tool chain.
+My host computer is a Mac and luckily there are  [Homebrew](https://brew.sh)
+installations packages out there for everything you need.
+Just install brew - if you not already have it installed - and have fun...
+
+The ARM compiler tool chain is available as Homebrew package in
+[osxcross repository](https://brew.sh).
+To install it you have to add this tap to brew and then install the package:
+
+    brew tap osx-cross/arm
+    brew install arm-gcc-bin
+
+The next thing that you need is [cmake](https://cmake.org).
+Installation is even more easy than the gnu tool chain:
+
+    brew install cmake
+
+I use an [ST-Link V2](https://www.st.com/en/development-tools/st-link-v2.html)
+to program and debug the software.
+Maybe I have a china clone because it was much cheaper than mentioned on the ST Website.
+The tools you need for this thing are installed with:
+
+    brew install stlink
+
+That's it!
+
+To compile the software use `cmake`:
+
+    cmake -DCMAKE_TOOLCHAIN_FILE=arm-toolchain.cmake -C arm .
+    cmake --build arm
+

@@ -1,6 +1,6 @@
 #include <stm32f1xx.h>
 
-#include "callback.h"
+#include "hooks.h"
 
 static unsigned volatile system_beat = 0;
 
@@ -23,7 +23,8 @@ static unsigned next_beat(unsigned current_beat)  {
 
 /*
  * Standard main function an embedded application.
- * It sets up the board, initializes the application and steps throut it driven by the system beat.
+ * It sets up the board, initializes the application
+ * and steps through it driven by the system beat.
  */
 int main(void) {
     unsigned current_beat = 0;

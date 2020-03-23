@@ -5,11 +5,11 @@
  *      Author: andreas
  */
 
-#include "runtime/callback.h"
+#include "runtime/hooks.h"
 #include "board/board.h"
 
 #define STEPS_PER_SECOND 1024
-#define DUTY              128
+#define DUTY              800
 
 unsigned init(void) {
     return STEPS_PER_SECOND;
