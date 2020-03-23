@@ -36,7 +36,7 @@ add_executable(blinky.elf
     blinky/src/app/blinky.c
     blinky/src/board/board.c
     blinky/src/board/board.h
-    blinky/src/runtime/callback.h
+    blinky/src/runtime/hooks.h
     blinky/src/runtime/main.c
     blinky/src/runtime/startup_stm32f103c8tx.s
     blinky/src/runtime/syscalls.c
