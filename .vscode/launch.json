@@ -12,7 +12,8 @@
             "cwd": "${workspaceFolder}",
             "MIMode": "gdb",
             "miDebuggerServerAddress": "localhost:4242",
-            "miDebuggerPath": "/usr/local/bin/arm-none-eabi-gdb"
+            "miDebuggerPath": "/usr/local/bin/arm-none-eabi-gdb",
+            "logging": { "engineLogging": true }
         }
     ]
 }

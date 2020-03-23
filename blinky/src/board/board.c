@@ -19,16 +19,14 @@
 void setup(void)  {
 
 	/*
-	 * IO-Port A is needed for debugging and flashing.
-	 * So turn it on if debugging is wanted.
+	 * Turn on Port C for the LED .
 	 */
-    RCC->APB2ENR |= RCC_APB2ENR_IOPAEN;
+    RCC->APB2ENR = RCC_APB2ENR_IOPCEN;
 
     /*
      * PIN 13 of IO-Port C is connected to the board internal LED.
      * This LED is used for the application
      */
-    RCC->APB2ENR |= RCC_APB2ENR_IOPCEN;
     GPIOC->CRH = 0x44144444;
 }
 
