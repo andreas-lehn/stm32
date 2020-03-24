@@ -2,9 +2,10 @@ cmake_minimum_required(VERSION 3.16)
 project(STM32 C ASM)
 
 include_directories(
-    CMSIS/include
-    CMSIS/Device/ST/STM32F1xx/Include
-    ${CMAKE_SOURCE_DIR}
+    src
+    src/CMSIS/include
+    src/CMSIS/Device/ST/STM32F1xx/Include
+    # ${CMAKE_SOURCE_DIR}
 )
 
 add_compile_options(
@@ -13,18 +14,18 @@ add_compile_options(
 )
 
 add_executable(blinky.elf
-    blinky/blinky.c
-    blinky/board.c
-    blinky/board.h
-    runtime/hooks.h
-    runtime/main.c
-    runtime/startup_stm32f103c8tx.s
-    runtime/system_stm32f1xx.c
+    src/blinky/blinky.c
+    src/blinky/board.c
+    src/blinky/board.h
+    src/runtime/hooks.h
+    src/runtime/main.c
+    src/runtime/startup_stm32f103c8tx.s
+    src/runtime/system_stm32f1xx.c
 )
 
 target_compile_definitions(blinky.elf PUBLIC STM32F103xB)
 
 target_link_options(blinky.elf PUBLIC
     -specs=nosys.specs # use libnosys as libc
-    -T ${CMAKE_SOURCE_DIR}/runtime/STM32F103C8TX_FLASH.ld  # linker script file
+    -T ${CMAKE_SOURCE_DIR}/src/runtime/STM32F103C8TX_FLASH.ld  # linker script file
 )
