@@ -5,6 +5,16 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "blinky-timer",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/blinky-timer.elf",
+            "cwd": "${workspaceFolder}",
+            "MIMode": "gdb",
+            "miDebuggerServerAddress": "localhost:4242",
+            "miDebuggerPath": "arm-none-eabi-gdb"
+        },
+        {
             "name": "blinky",
             "type": "cppdbg",
             "request": "launch",

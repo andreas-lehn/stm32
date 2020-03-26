@@ -30,6 +30,19 @@ target_link_options(blinky.elf PUBLIC
     -T ${CMAKE_SOURCE_DIR}/src/runtime/STM32F103C8TX_FLASH.ld  # linker script file
 )
 
+add_executable(blinky-timer.elf
+    src/blinky/blinky-timer.c
+    src/runtime/startup_stm32f103c8tx.s
+    src/runtime/system_stm32f1xx.c
+)
+
+target_compile_definitions(blinky-timer.elf PUBLIC STM32F103xB)
+
+target_link_options(blinky-timer.elf PUBLIC
+    -specs=nosys.specs # use libnosys as libc
+    -T ${CMAKE_SOURCE_DIR}/src/runtime/STM32F103C8TX_FLASH.ld  # linker script file
+)
+
 add_executable(servo.elf
     src/servo/servo.c
     src/servo/board.h
@@ -46,4 +59,3 @@ target_link_options(servo.elf PUBLIC
     -specs=nosys.specs # use libnosys as libc
     -T ${CMAKE_SOURCE_DIR}/src/runtime/STM32F103C8TX_FLASH.ld  # linker script file
 )
-
