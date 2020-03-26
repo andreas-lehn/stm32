@@ -1,8 +1,5 @@
 /*
- * board.c
- *
- *  Created on: 20.03.2020
- *      Author: andreas
+ * Implementation of the hardware access functions of the servo application.
  */
 
 #include "board.h"
@@ -22,16 +19,14 @@
 /*
  * Setup the board peripherals.
  */
-void setup(void)  {
+void setup()  {
 
-	/*
-	 * Turn on Peripherals
-	 */
-    RCC->APB2ENR |= RCC_APB2ENR_IOPAEN   // Port A
-                  | RCC_APB2ENR_IOPBEN   // Port B
-                  | RCC_APB2ENR_IOPCEN;   // Port C
+	/* Turn on clock of rquired peripherals */
+    RCC->APB2ENR |= RCC_APB2ENR_IOPAEN
+                  | RCC_APB2ENR_IOPBEN
+                  | RCC_APB2ENR_IOPCEN;
 
-    RCC->APB1ENR |= RCC_APB1ENR_TIM4EN;  // Timmer 4
+    RCC->APB1ENR |= RCC_APB1ENR_TIM4EN;
 
     /* 
      * Each Pin of each Port is configured by by 4 bits.
@@ -68,14 +63,16 @@ void setup(void)  {
      * PIN 7: LED Position 1 => 6 = Output 2 MHz open-drain
      */
     GPIOA->CRL = 0x64848446;
-    GPIOA->ODR = PIN3 | PIN5; // Configure input pins as pull-up 
+
+    /* Configure input pins as pull-up */
+    GPIOA->ODR = PIN3 | PIN5;
 
     /*
      * On Port B
      * 
      * PIN 9: Servo Signal => A = Output 2 MHz alternate function (timer 4, channel 4) push-pull
      */
-    GPIOB->CRH = 0x444444A6;
+    GPIOB->CRH = 0x444444A4;
 
     /*
      * On Port C
@@ -112,48 +109,31 @@ void setup(void)  {
      */
     TIM4->CCR4 = SERVO_MID_DUTY;
 
-    /* Enable interrupts for timer 4 */
-    //TIM4->DIER = TIM_DIER_UIE | TIM_DIER_CC4IE;
-    //NVIC_EnableIRQ(TIM4_IRQn);
-
     /* Enable the counter */
     TIM4->CR1 |= TIM_CR1_CEN;
 }
 
-void TIM4_IRQHandler(void) {
-    int counter = TIM4->CNT;
-    int status = TIM4->SR;
-    if (status & TIM_SR_UIF) {
-        TIM4->SR &= ~TIM_SR_UIF;
-        GPIOB->BRR = PIN8;
-    }
-    if (status & TIM_SR_CC4IF) {
-        TIM4->SR &= ~TIM_SR_CC4IF;
-        GPIOB->BSRR = PIN8;
-    }
-}
-
-void moving_led_on(void) {
+void moving_led_on() {
     GPIOC->BRR = PIN13;
 }
 
-void moving_led_off(void) {
+void moving_led_off() {
     GPIOC->BSRR = PIN13;
 }
 
-void position_0_led_on(void) {
+void position_0_led_on() {
     GPIOA->BRR = PIN0;
 }
 
-void position_0_led_off(void) {
+void position_0_led_off() {
     GPIOA->BSRR = PIN0;
 }
 
-void position_1_led_on(void) {
+void position_1_led_on() {
     GPIOA->BRR = PIN7;
 }
 
-void position_1_led_off(void) {
+void position_1_led_off() {
     GPIOA->BSRR = PIN7;
 }
 

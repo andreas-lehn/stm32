@@ -30,15 +30,15 @@ target_link_options(blinky.elf PUBLIC
     -T ${CMAKE_SOURCE_DIR}/src/runtime/STM32F103C8TX_FLASH.ld  # linker script file
 )
 
-add_executable(blinky-timer.elf
-    src/blinky/blinky-timer.c
+add_executable(timer-demo.elf
+    src/demos/timer.c
     src/runtime/startup_stm32f103c8tx.s
     src/runtime/system_stm32f1xx.c
 )
 
-target_compile_definitions(blinky-timer.elf PUBLIC STM32F103xB)
+target_compile_definitions(timer-demo.elf PUBLIC STM32F103xB)
 
-target_link_options(blinky-timer.elf PUBLIC
+target_link_options(timer-demo.elf PUBLIC
     -specs=nosys.specs # use libnosys as libc
     -T ${CMAKE_SOURCE_DIR}/src/runtime/STM32F103C8TX_FLASH.ld  # linker script file
 )

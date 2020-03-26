@@ -1,8 +1,11 @@
 /*
  * blinky-timer demonstrates three timer based approaches to blink an LED:
- * 1. Wait until a timer expires and switch the LED (PC13) on and off
- * 2. Switch a LED (PB8) on and off in an interupt service routine
- * 3. Switch a LED (PB9) with a PWM signal on and off
+ * 
+ *  1. Wait until a timer expires and switch the LED (PC13) on and off
+ * 
+ *  2. Switch a LED (PB8) on and off in an interupt service routine
+ * 
+ *  3. Switch a LED (PB9) with a PWM signal on and off
  */
 
 #include <stm32f1xx.h>
@@ -14,13 +17,13 @@
 
 int main()  {
 	/* Turn on clock for required peripherals */
-    RCC->APB2ENR |= RCC_APB2ENR_IOPBEN   // Port B
-                  | RCC_APB2ENR_IOPCEN;  // Port C
+    RCC->APB2ENR |= RCC_APB2ENR_IOPBEN
+                  | RCC_APB2ENR_IOPCEN;
 
-    RCC->APB1ENR |= RCC_APB1ENR_TIM4EN;  // Timmer 4
+    RCC->APB1ENR |= RCC_APB1ENR_TIM4EN;
 
     /* 
-     * Each Pin of each Port is configured by by 4 bits.
+     * Each Pin of each GPIO Port is configured by by 4 bits.
      * So for each pin there is a configuration value range of 0 .. F
      * The bit coding is a little bit confusing.
      * The following list explains the meanung of each number:
@@ -41,8 +44,6 @@ int main()  {
      *  D   Output 10 MZz   alternate open-drain
      *  E   Output  2 MHz   alternate open-drain
      *  F   Output 50 MHz   alternate open-drain
-     * 
-     * So just have a look in this table to know what is going on...
      */
 
     /*
@@ -156,7 +157,7 @@ const struct dispatch_entry timer4_dispatch_table[] = {
 /*
  * ISR of timer 4 dispatches the event according to the dispatch table.
  */
-void TIM4_IRQHandler(void) {
+void TIM4_IRQHandler() {
     for (int i = 0;  timer4_dispatch_table[i].event != 0; i++) {
         int evt = timer4_dispatch_table[i].event;
         if (TIM4->SR & evt) {

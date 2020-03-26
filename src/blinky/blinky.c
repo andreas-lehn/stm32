@@ -11,7 +11,7 @@
 #define STEPS_PER_SECOND 1024
 #define DUTY              800
 
-unsigned init(void) {
+unsigned init() {
     return STEPS_PER_SECOND;
 }
 

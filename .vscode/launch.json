@@ -5,17 +5,17 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "blinky-timer",
+            "name": "Timer Demo",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/blinky-timer.elf",
+            "program": "${workspaceFolder}/build/timer-demo.elf",
             "cwd": "${workspaceFolder}",
             "MIMode": "gdb",
             "miDebuggerServerAddress": "localhost:4242",
             "miDebuggerPath": "arm-none-eabi-gdb"
         },
         {
-            "name": "blinky",
+            "name": "Blinky App",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/blinky.elf",
@@ -26,7 +26,7 @@
             "miDebuggerPath": "arm-none-eabi-gdb"
         },
         {
-            "name": "servo",
+            "name": "Servo App",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/servo.elf",

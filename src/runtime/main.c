@@ -7,7 +7,7 @@ static unsigned volatile system_beat = 0;
 /*
  * Callback of the SysTick counter increments the system beat
  */
-void SysTick_Handler(void) {
+void SysTick_Handler() {
     system_beat++;
 }
 
@@ -26,7 +26,7 @@ static unsigned next_beat(unsigned current_beat)  {
  * It sets up the board, initializes the application
  * and steps through it driven by the system beat.
  */
-int main(void) {
+int main() {
     unsigned current_beat = 0;
 
     setup();

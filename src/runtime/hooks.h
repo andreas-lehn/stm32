@@ -13,7 +13,7 @@
 /*
  * Setup has to set up the board and configure all peripherals so that is is useable for the application.
  */
-void setup(void);
+void setup();
 
 /*
  * Init initializes the application.
@@ -22,7 +22,7 @@ void setup(void);
  *
  * Init returns the amount of beats per second that it wants to have.
  */
-unsigned init(void);
+unsigned init();
 
 /*
  * Step executes one step of the application triggered by the system beat.

@@ -1,6 +1,4 @@
 /*
- * board.h
- * 
  * This is the interface to the hardware of the servo application
  */
 
@@ -14,7 +12,7 @@ void moving_led_on();
 void moving_led_off();
 
 /*
- * The end_point_led indicate that the servo has reached one of its endpoints.
+ * The position LED indicate that the servo has reached one of its end positions.
  */
 void position_0_led_on();
 void position_0_led_off();
@@ -30,8 +28,7 @@ int switch_position();
 
 /*
  * Sets the position of the servo.
- * Range allowed +/-1024
- * +/-512 is +/-90°
+ * Range allowed +/-1000
  */
 void servo_position(int position);
 
