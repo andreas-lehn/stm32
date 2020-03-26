@@ -5,12 +5,22 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "blinky debug",
+            "name": "blinky",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/blinky.elf",
             "cwd": "${workspaceFolder}",
             // "logging": { "engineLogging": true },
+            "MIMode": "gdb",
+            "miDebuggerServerAddress": "localhost:4242",
+            "miDebuggerPath": "arm-none-eabi-gdb"
+        },
+        {
+            "name": "servo",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/servo.elf",
+            "cwd": "${workspaceFolder}",
             "MIMode": "gdb",
             "miDebuggerServerAddress": "localhost:4242",
             "miDebuggerPath": "arm-none-eabi-gdb"

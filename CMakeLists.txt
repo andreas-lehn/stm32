@@ -29,3 +29,21 @@ target_link_options(blinky.elf PUBLIC
     -specs=nosys.specs # use libnosys as libc
     -T ${CMAKE_SOURCE_DIR}/src/runtime/STM32F103C8TX_FLASH.ld  # linker script file
 )
+
+add_executable(servo.elf
+    src/servo/servo.c
+    src/servo/board.h
+    src/servo/board.c
+    src/runtime/hooks.h
+    src/runtime/main.c
+    src/runtime/startup_stm32f103c8tx.s
+    src/runtime/system_stm32f1xx.c
+)
+
+target_compile_definitions(servo.elf PUBLIC STM32F103xB)
+
+target_link_options(servo.elf PUBLIC
+    -specs=nosys.specs # use libnosys as libc
+    -T ${CMAKE_SOURCE_DIR}/src/runtime/STM32F103C8TX_FLASH.ld  # linker script file
+)
+
