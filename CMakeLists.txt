@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(STM32 C ASM)
+project(STM32 C)
 
 include_directories(
     src
