@@ -5,8 +5,8 @@
  *      Author: andreas
  */
 
-#include "runtime/hooks.h"
 #include "board.h"
+#include "framework/hooks.h"
 
 static struct servo {
     int current_position;

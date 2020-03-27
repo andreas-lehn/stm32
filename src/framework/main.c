@@ -1,5 +1,5 @@
-#include "system.h"
 #include "hooks.h"
+#include "runtime/system.h"
 
 static unsigned volatile system_beat = 0;
 

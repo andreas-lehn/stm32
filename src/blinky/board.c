@@ -6,7 +6,7 @@
  */
 
 #include "board.h"
-#include "runtime/hooks.h"
+#include "framework/hooks.h"
 
 #include <stm32f1xx.h>
 

@@ -16,10 +16,11 @@ add_executable(blinky.elf
     src/blinky/blinky.c
     src/blinky/board.c
     src/blinky/board.h
-    src/runtime/hooks.h
-    src/runtime/main.c
+    src/framework/hooks.h
+    src/framework/main.c
     src/runtime/crt.c
     src/runtime/isr_vector.c
+    src/runtime/system.h
     src/runtime/system.c
 )
 
@@ -35,6 +36,7 @@ add_executable(timer-demo.elf
     src/demos/timer.c
     src/runtime/crt.c
     src/runtime/isr_vector.c
+    src/runtime/system.h
     src/runtime/system.c
 )
 
@@ -50,10 +52,11 @@ add_executable(servo.elf
     src/servo/servo.c
     src/servo/board.h
     src/servo/board.c
-    src/runtime/hooks.h
-    src/runtime/main.c
+    src/framework/hooks.h
+    src/framework/main.c
     src/runtime/crt.c
     src/runtime/isr_vector.c
+    src/runtime/system.h
     src/runtime/system.c
 )
 
