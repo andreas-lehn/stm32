@@ -13,7 +13,7 @@ _stack_top = ORIGIN(RAM) + LENGTH(RAM);
 SECTIONS {
     .text : {
         . = ALIGN(4);
-        KEEP(*(.isr_vector))
+        KEEP(*(.vector))
         *(.text)      
         *(.text*)     
         KEEP(*(.init))

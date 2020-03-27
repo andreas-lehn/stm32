@@ -19,7 +19,7 @@ add_executable(blinky.elf
     src/framework/hooks.h
     src/framework/main.c
     src/runtime/crt.c
-    src/runtime/isr_vector.c
+    src/runtime/vector_table.c
     src/runtime/system.h
     src/runtime/system.c
 )
@@ -35,7 +35,7 @@ target_link_options(blinky.elf PUBLIC
 add_executable(timer-demo.elf
     src/demos/timer.c
     src/runtime/crt.c
-    src/runtime/isr_vector.c
+    src/runtime/vector_table.c
     src/runtime/system.h
     src/runtime/system.c
 )
@@ -55,7 +55,7 @@ add_executable(servo.elf
     src/framework/hooks.h
     src/framework/main.c
     src/runtime/crt.c
-    src/runtime/isr_vector.c
+    src/runtime/vector_table.c
     src/runtime/system.h
     src/runtime/system.c
 )

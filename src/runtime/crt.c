@@ -28,78 +28,51 @@ extern int main(int argc, char **argv);
  */
 
 /* Data segment */
-extern unsigned __etext;
-extern unsigned __data_start__;
-extern unsigned __data_end__;
+extern int __etext;
+extern int __data_start__;
+extern int __data_end__;
 
 /* BSS segment */
-extern unsigned __bss_start__;
-extern unsigned __bss_end__;
+extern int __bss_start__;
+extern int __bss_end__;
 
-/* The start and end addresses of preinit/init/fini array */
-extern void (*__preinit_array_start[])() __attribute__((weak));
-extern void (*__preinit_array_end[])() __attribute__((weak));
-extern void (*__init_array_start[])() __attribute__((weak));
-extern void (*__init_array_end[])() __attribute__((weak));
-extern void (*__fini_array_start[])() __attribute__((weak));
-extern void (*__fini_array_end[])() __attribute__((weak));
-
-/*
- * Copy data to the data section
- */
-void copy_data(unsigned* from, unsigned* section_begin, unsigned* section_end) {
-    for (unsigned int *p = section_begin; p < section_end; p++, from++) {
-        *p = *from;
-    }
-}
+/* The start and end addresses of preinit/init/fini function array */
+extern void (*__preinit_array_start)() __attribute__((weak));
+extern void (*__preinit_array_end)() __attribute__((weak));
+extern void (*__init_array_start)() __attribute__((weak));
+extern void (*__init_array_end)() __attribute__((weak));
+extern void (*__fini_array_start)() __attribute__((weak));
+extern void (*__fini_array_end)() __attribute__((weak));
 
 /*
- * Clear bss section
+ * Start initialise the C runtime, calls main and does the clean-up.
+ * This function is sometime also called __main oder _start
+ * when it is implemented by libc or newlib.
  */
-void clear_bss(unsigned int* section_begin, unsigned int* section_end) {
-    for (unsigned int *p = section_begin; p < section_end; p++) {
-        *p = 0;
-    }
-}
+static void start() {
+    /* clear BSS segment */
+    for (int *p = &__bss_start__; p < &__bss_end__; p++) *p = 0;
 
-/*
- * Iterate over an array of void-void-functions and execute them.
- * These functions are mainly static constructors/destructors).
- */
-void run_array(void (**start)(), void (**end)()) {
-    for (void (**i)() = start; i < end; i++) {
-        (*i)();
-    }
-}
+    /* initialize data segment */
+    for (int *p = &__data_start__, *from = &__etext; p < &__data_end__; p++, from++) *p = *from;
 
-/*
- * Same as run_array only in the reveser direction.
- */
-void run_array_reverse(void (**start)(), void (**end)()) {
-    for (void (**i)() = end - 1; i >= start; i--) {
-        (*i)();
-    }
-}
+    /* run pre init functions */
+    for (void (**f)() = &__preinit_array_start; f < &__preinit_array_end; f++) (*f)();
 
-/*
- * startup does all the work...
- */
-static void __main() {
-    clear_bss(&__bss_start__, &__bss_end__);
-    copy_data(&__etext, &__data_start__, &__data_end__);
-    run_array(__preinit_array_start, __preinit_array_end);
-    run_array(__init_array_start, __init_array_end);
+    /* run init functions */
+    for (void (**f)() = &__init_array_start; f < &__init_array_end; f++) (*f)();
 
     main(0, NULL);
 
-    run_array_reverse(__fini_array_start, __fini_array_end);
+    /* run fini functions in reveser order */
+    for (void (**f)() = &__fini_array_start - 1; f >= &__fini_array_end; f--) (*f)();
 }
 
 /*
- * on_reset starts the system.
+ * Start the system on startup event.
  */
-void on_reset() {
+void on_startup() {
     system_init();
-    __main();
+    start();
     system_reset();
 }

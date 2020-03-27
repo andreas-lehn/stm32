@@ -1,29 +1,34 @@
 /*
- * This module provides the address vector of the exception/interrupt service routines for a STM32 with Cortex-M processor.
+ * Vector table for a STM32/Cortex-M3 processor.
  */
 
 /*
- * Top of the stack address has to be provided by the linker and is defined in the linker script file.
+ * Top of the stack address has to be provided by the linker.
+ * It is defined in the linker script file.
  */
-extern void * _stack_top;
+extern int _stack_top;
 
 /*
- * Default Handler for unhandled interrupts
+ * Default Handler for unhandled exeptions/interrupts.
  */ 
 static void default_handler() {
     while(1);
 }
 
 /*
+ * Startup function is the first entry point a startup/after reset.
+ */
+void on_startup()           __attribute__ ((weak, alias("default_handler")));
+
+/*
  * Exceptions
  */
-void on_reset()           __attribute__ ((weak, alias("default_handler")));
 void on_non_mask_int()    __attribute__ ((weak, alias("default_handler")));
 void on_hard_fault()      __attribute__ ((weak, alias("default_handler")));
-void on_mem_manage()      __attribute__ ((weak, alias("default_handler")));
+void on_mem_mgnt_fault()  __attribute__ ((weak, alias("default_handler")));
 void on_bus_fault()       __attribute__ ((weak, alias("default_handler")));
 void on_usage_fault()     __attribute__ ((weak, alias("default_handler")));
-void on_svc()             __attribute__ ((weak, alias("default_handler")));
+void on_sv_call()         __attribute__ ((weak, alias("default_handler")));
 void on_debug_mon()       __attribute__ ((weak, alias("default_handler")));
 void on_pend_sv()         __attribute__ ((weak, alias("default_handler")));
 void on_sys_tick()        __attribute__ ((weak, alias("default_handler")));
@@ -78,19 +83,19 @@ void on_usb_wakeup()      __attribute__ ((weak, alias("default_handler")));
 /*
  * Definition of the address vector.
  */
-void * _address_vector[] __attribute__((section(".vector"))) = {
+const void * _vector_table[] __attribute__ ((section(".vector"))) = {
     &_stack_top,
-    on_reset,
+    on_startup,
     on_non_mask_int,
     on_hard_fault,
-    on_mem_manage,
+    on_mem_mgnt_fault,
     on_bus_fault,
     on_usage_fault,
     0,
     0,
     0,
     0,
-    on_svc,
+    on_sv_call,
     on_debug_mon,
     0,
     on_pend_sv,
@@ -137,12 +142,5 @@ void * _address_vector[] __attribute__((section(".vector"))) = {
     on_usart3,
     on_ext_int15_10,
     on_rtc_alarm,
-    on_usb_wakeup,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0
+    on_usb_wakeup
 };
