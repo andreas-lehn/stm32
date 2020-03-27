@@ -15,7 +15,7 @@
 #define PIN9  (1 << 9)
 #define PIN13 (1 << 13)
 
-int main()  {
+int main(int argc, char **argv)  {
 	/* Turn on clock for required peripherals */
     RCC->APB2ENR |= RCC_APB2ENR_IOPBEN
                   | RCC_APB2ENR_IOPCEN;
@@ -157,7 +157,7 @@ const struct dispatch_entry timer4_dispatch_table[] = {
 /*
  * ISR of timer 4 dispatches the event according to the dispatch table.
  */
-void TIM4_IRQHandler() {
+void on_timer4() {
     for (int i = 0;  timer4_dispatch_table[i].event != 0; i++) {
         int evt = timer4_dispatch_table[i].event;
         if (TIM4->SR & evt) {

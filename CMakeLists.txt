@@ -3,9 +3,8 @@ project(STM32 C ASM)
 
 include_directories(
     src
-    src/CMSIS/include
-    src/CMSIS/Device/ST/STM32F1xx/Include
-    # ${CMAKE_SOURCE_DIR}
+    lib/CMSIS/Device/ST/STM32F1xx/Include
+    lib/CMSIS/include
 )
 
 add_compile_options(
@@ -19,28 +18,32 @@ add_executable(blinky.elf
     src/blinky/board.h
     src/runtime/hooks.h
     src/runtime/main.c
-    src/runtime/startup_stm32f103c8tx.s
-    src/runtime/system_stm32f1xx.c
+    src/runtime/crt.c
+    src/runtime/isr_vector.c
+    src/runtime/system.c
 )
 
 target_compile_definitions(blinky.elf PUBLIC STM32F103xB)
 
 target_link_options(blinky.elf PUBLIC
     -specs=nosys.specs # use libnosys as libc
-    -T ${CMAKE_SOURCE_DIR}/src/runtime/STM32F103C8TX_FLASH.ld  # linker script file
+    -nostartfiles
+    -T ${CMAKE_SOURCE_DIR}/src/runtime/arm-gcc.ld
 )
 
 add_executable(timer-demo.elf
     src/demos/timer.c
-    src/runtime/startup_stm32f103c8tx.s
-    src/runtime/system_stm32f1xx.c
+    src/runtime/crt.c
+    src/runtime/isr_vector.c
+    src/runtime/system.c
 )
 
 target_compile_definitions(timer-demo.elf PUBLIC STM32F103xB)
 
 target_link_options(timer-demo.elf PUBLIC
     -specs=nosys.specs # use libnosys as libc
-    -T ${CMAKE_SOURCE_DIR}/src/runtime/STM32F103C8TX_FLASH.ld  # linker script file
+    -nostartfiles
+    -T ${CMAKE_SOURCE_DIR}/src/runtime/arm-gcc.ld
 )
 
 add_executable(servo.elf
@@ -49,13 +52,15 @@ add_executable(servo.elf
     src/servo/board.c
     src/runtime/hooks.h
     src/runtime/main.c
-    src/runtime/startup_stm32f103c8tx.s
-    src/runtime/system_stm32f1xx.c
+    src/runtime/crt.c
+    src/runtime/isr_vector.c
+    src/runtime/system.c
 )
 
 target_compile_definitions(servo.elf PUBLIC STM32F103xB)
 
 target_link_options(servo.elf PUBLIC
     -specs=nosys.specs # use libnosys as libc
-    -T ${CMAKE_SOURCE_DIR}/src/runtime/STM32F103C8TX_FLASH.ld  # linker script file
+    -nostartfiles
+    -T ${CMAKE_SOURCE_DIR}/src/runtime/arm-gcc.ld
 )

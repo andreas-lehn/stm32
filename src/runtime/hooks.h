@@ -27,6 +27,6 @@ unsigned init();
 /*
  * Step executes one step of the application triggered by the system beat.
  */
-void step(int beat);
+void step(unsigned beat);
 
 #endif /* _RUNTIME_CALLBACK_H_ */

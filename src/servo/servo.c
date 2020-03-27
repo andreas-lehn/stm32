@@ -55,7 +55,7 @@ unsigned init() {
     return BEATS_PER_SECOND;
 }
 
-void step(int beat) {
+void step(unsigned beat) {
     int switch_pos = switch_position();
     if (switch_pos >= 0) servo.target_position = servo.end_position[switch_pos];
     servo_control(&servo);

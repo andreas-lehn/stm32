@@ -15,7 +15,7 @@ unsigned init() {
     return STEPS_PER_SECOND;
 }
 
-void step(int beat) {
+void step(unsigned beat) {
     if ((beat % STEPS_PER_SECOND) < DUTY) {
         led_on();
     } else {

@@ -1,5 +1,4 @@
-#include <stm32f1xx.h>
-
+#include "system.h"
 #include "hooks.h"
 
 static unsigned volatile system_beat = 0;
@@ -7,7 +6,7 @@ static unsigned volatile system_beat = 0;
 /*
  * Callback of the SysTick counter increments the system beat
  */
-void SysTick_Handler() {
+void on_system_tick() {
     system_beat++;
 }
 
@@ -16,7 +15,7 @@ void SysTick_Handler() {
  */
 static unsigned next_beat(unsigned current_beat)  {
     while (system_beat == current_beat)  {
-        __WFE(); // Power-Down until next Event/Interrupt
+        system_wait_for_event();
     }
     return system_beat;
 }
@@ -26,13 +25,14 @@ static unsigned next_beat(unsigned current_beat)  {
  * It sets up the board, initializes the application
  * and steps through it driven by the system beat.
  */
-int main() {
+int main(int argc, char** argv) {
     unsigned current_beat = 0;
 
+    system_core_clock_update();
     setup();
 
     unsigned beats_per_second = init();
-    SysTick_Config(SystemCoreClock / beats_per_second);
+    system_tick_config(system_core_clock / beats_per_second);
 
     while (1) {
     	step(current_beat);
