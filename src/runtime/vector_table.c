@@ -18,12 +18,12 @@ static void default_handler() {
 /*
  * Startup function is the first entry point a startup/after reset.
  */
-void on_startup()           __attribute__ ((weak, alias("default_handler")));
+void on_reset()           __attribute__ ((weak, alias("default_handler")));
 
 /*
  * Exceptions
  */
-void on_non_mask_int()    __attribute__ ((weak, alias("default_handler")));
+void on_nmi()             __attribute__ ((weak, alias("default_handler")));
 void on_hard_fault()      __attribute__ ((weak, alias("default_handler")));
 void on_mem_mgnt_fault()  __attribute__ ((weak, alias("default_handler")));
 void on_bus_fault()       __attribute__ ((weak, alias("default_handler")));
@@ -85,8 +85,8 @@ void on_usb_wakeup()      __attribute__ ((weak, alias("default_handler")));
  */
 const void * _vector_table[] __attribute__ ((section(".vector"))) = {
     &_stack_top,
-    on_startup,
-    on_non_mask_int,
+    on_reset,
+    on_nmi,
     on_hard_fault,
     on_mem_mgnt_fault,
     on_bus_fault,

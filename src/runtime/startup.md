@@ -16,7 +16,9 @@ Vector Table
 ------------
 
 https://developer.arm.com/docs/dui0552/a
-https://developer.arm.com/docs/dui0553/latest/the-cortex-m4-processor/exception-model/vector-table
+https://developer.arm.com/docs/dui0552/a/the-cortex-m3-processor/exception-model/exception-types
+https://developer.arm.com/docs/dui0552/a/the-cortex-m3-processor/exception-model/vector-table
+
 
 Linkers and Loaders
 -------------------
@@ -37,3 +39,4 @@ Resources
  * https://www.silabs.com/community/mcu/32-bit/knowledge-base.entry.html/2018/12/06/understand_the_gnul-PTm6
  * https://github.com/JoeMerten/Stm32/blob/master/EgaTest/Cxx-F103-TraceNone/system/src/newlib/_startup.c
  * https://arm-software.github.io/CMSIS_5/Core/html/startup_c_pg.html
+ * https://developer.arm.com/docs/dui0552/a/the-cortex-m3-instruction-set/cmsis-functions

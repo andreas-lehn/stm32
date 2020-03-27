@@ -69,9 +69,9 @@ static void start() {
 }
 
 /*
- * Start the system on startup event.
+ * Start the system on reset event.
  */
-void on_startup() {
+void on_reset() {
     system_init();
     start();
     system_reset();
