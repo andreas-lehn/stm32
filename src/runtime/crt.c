@@ -28,14 +28,6 @@ extern char __data_end;
 extern char __bss_start__;
 extern char __bss_end__;
 
-/* The start and end addresses of preinit/init/fini function array */
-extern void (*__preinit_array_start)() __attribute__((weak));
-extern void (*__preinit_array_end)() __attribute__((weak));
-extern void (*__init_array_start)() __attribute__((weak));
-extern void (*__init_array_end)() __attribute__((weak));
-extern void (*__fini_array_start)() __attribute__((weak));
-extern void (*__fini_array_end)() __attribute__((weak));
-
 /*
  * Initialise the C runtime and run main.
  * 
@@ -50,15 +42,8 @@ void _start() {
 
     /* initialize data segment */
     memcpy(&__data_start, &__data_load, &__data_end - &__data_start);
-
-    /* run pre init and init functions */
-    for (void (**f)() = &__preinit_array_start; f < &__init_array_start; f++) (*f)();
-    for (void (**f)() = &__init_array_start; f < &__init_array_start; f++) (*f)();
     
     main(0, NULL);
-
-    /* run fini functions in reveser order */
-    for (void (**f)() = &__fini_array_end - 1; f >= &__fini_array_start; f--) (*f)();
 }
 
 /*

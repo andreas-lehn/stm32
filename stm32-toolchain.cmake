@@ -1,8 +1,10 @@
 set(CMAKE_SYSTEM_NAME Generic)
 set(CMAKE_SYSTEM_PROCESSOR arm)
 
+#
+# C Compiler
+#
 set(CMAKE_C_COMPILER arm-none-eabi-gcc)
-set(CMAKE_ASM_COMPILER ${CMAKE_C_COMPILER})
 
 set(CMAKE_C_FLAGS "-mcpu=cortex-m3 -mthumb -mfloat-abi=soft -ffunction-sections -fdata-sections")
 #  -mcpu=cortex-m3      Specify the name of the target CPU
@@ -11,9 +13,10 @@ set(CMAKE_C_FLAGS "-mcpu=cortex-m3 -mthumb -mfloat-abi=soft -ffunction-sections 
 #  -ffunction-sections  Place each function
 #  -fdata-sections      or data item in its own section
 
-set(CMAKE_C_FLAGS_DEBUG "-g3 -O0")
+set(CMAKE_C_FLAGS_DEBUG "-g3 -O0 -DDEBUG")
 #    -g3                debug information level 3
 #    -O0                No optimization (Optimization level 0)
+#    -DDEBUG            Set DEBUG
 
 set(CMAKE_C_FLAGS_RELEASE "-O3 -DNDEBUG")
 #    -O3                Optimization for speed (Optimization level 3)
@@ -28,6 +31,14 @@ set(CMAKE_C_FLAGS_RELWITHDBGINFO "-Og -g3 -DNDEBUG")
 #    -g3                Include debug info
 #    -DNDEBUG           Set NDEBUG
 
+#
+# Assembler
+#
+set(CMAKE_ASM_COMPILER ${CMAKE_C_COMPILER})
+
+#
+# Linker flags
+#
 set(CMAKE_LDFLAGS "-static -mfloat-abi=soft -mthumb -flto")
 #    -static             # force static linking (no shared objects)
 #    -mfloat-abi=soft    

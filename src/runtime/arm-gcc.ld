@@ -17,7 +17,6 @@ SECTIONS {
         . = ALIGN(4);
         KEEP ( * (.rodata.vector_table))
         * (.text .text.*)     
-        KEEP ( * (.init .fini))
     } > ROM
  
     .data : {
@@ -32,16 +31,6 @@ SECTIONS {
         . = ALIGN(4);
         * (.rodata .rodata.*)
         . = ALIGN(4);
-        __preinit_array_start = .;
-        KEEP ( * (.preinit_array*))
-        __preinit_array_end = .;
-        __init_array_start = .;
-        KEEP ( * (SORT(.init_array.*)))
-        __init_array_end = .;
-        KEEP ( * (.init_array*))
-        __fini_array_start = .;
-        KEEP ( * (SORT(.fini_array.*)))
-        __fini_array_end = .;
     } > ROM
 
     .bss : {

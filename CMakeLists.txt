@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(STM32 C)
+project(STM32)
 
 include_directories(
     src
@@ -68,7 +68,7 @@ target_link_options(servo.elf PUBLIC
     -T ${CMAKE_SOURCE_DIR}/src/runtime/arm-gcc.ld
 )
 
-add_executable(test-crt.elf
+add_executable(test-crt-c.elf
     test/runtime/test_crt.c
     src/runtime/crt.c
     src/runtime/vector_table.c
@@ -76,9 +76,9 @@ add_executable(test-crt.elf
     src/runtime/system.c
 )
 
-target_compile_definitions(test-crt.elf PUBLIC STM32F103xB)
+target_compile_definitions(test-crt-c.elf PUBLIC STM32F103xB)
 
-target_link_options(test-crt.elf PUBLIC
+target_link_options(test-crt-c.elf PUBLIC
     -specs=nosys.specs
     -nostartfiles
     -T ${CMAKE_SOURCE_DIR}/src/runtime/arm-gcc.ld
