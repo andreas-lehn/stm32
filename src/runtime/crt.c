@@ -20,13 +20,13 @@ extern int main(int argc, char **argv);
  */
 
 /* Data segment */
-extern int __etext;
-extern int __data_start__;
-extern int __data_end__;
+extern char __etext;
+extern char __data_start__;
+extern char __data_end__;
 
 /* BSS segment */
-extern int __bss_start__;
-extern int __bss_end__;
+extern char __bss_start__;
+extern char __bss_end__;
 
 /* The start and end addresses of preinit/init/fini function array */
 extern void (*__preinit_array_start)() __attribute__((weak));
@@ -46,10 +46,10 @@ extern void (*__fini_array_end)() __attribute__((weak));
  */
 void _start() {
     /* clear BSS segment */
-    memset(&__bss_start__, 0, (&__bss_end__ - &__bss_start__));
+    memset(&__bss_start__, 0, &__bss_end__ - &__bss_start__);
 
     /* initialize data segment */
-    memcpy(&__data_start__, &__etext, (&__data_end__ - &__data_start__));
+    memcpy(&__data_start__, &__etext, &__data_end__ - &__data_start__);
 
     /* run pre init and init functions */
     for (void (**f)() = &__preinit_array_start; f < &__init_array_start; f++) (*f)();
