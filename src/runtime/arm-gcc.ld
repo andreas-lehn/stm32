@@ -10,52 +10,48 @@ MEMORY {
 STACK_SIZE = 0x1000; /* 4K */
 
 /* Highest address of the user mode stack is end of RAM */
-__stack = ORIGIN(RAM) + LENGTH(RAM);
+_stack = ORIGIN(RAM) + LENGTH(RAM);
 
 SECTIONS {
     .text : {
         . = ALIGN(4);
-        KEEP (*(.rodata.vector_table))
-        *(.text*)     
-        KEEP(*(.init))
-        KEEP(*(.fini))
-        __etext = .;
+        KEEP ( * (.rodata.vector_table))
+        * (.text .text.*)     
+        KEEP ( * (.init .fini))
     } > ROM
  
     .data : {
         . = ALIGN(4);
-        __data_start__ = .;
-        *(.data*)       
-        . = ALIGN(4);
-        __data_end__ = .; 
+        __data_start = .;
+        * (.data .data.*)       
+        __data_end = .; 
     } > RAM AT > ROM
+    __data_load = LOADADDR(.data);
 
     .rodata : {
-        *(.rodata*)
-        /* The following addresses are need for __libc_init_array and __libc_finit_array */
+        . = ALIGN(4);
+        * (.rodata .rodata.*)
+        . = ALIGN(4);
         __preinit_array_start = .;
-        KEEP (*(.preinit_array*))
+        KEEP ( * (.preinit_array*))
         __preinit_array_end = .;
         __init_array_start = .;
-        KEEP (*(SORT(.init_array.*)))
+        KEEP ( * (SORT(.init_array.*)))
         __init_array_end = .;
-        KEEP (*(.init_array*))
+        KEEP ( * (.init_array*))
         __fini_array_start = .;
-        KEEP (*(SORT(.fini_array.*)))
-        KEEP (*(.fini_array*))
+        KEEP ( * (SORT(.fini_array.*)))
         __fini_array_end = .;
     } > ROM
 
     .bss : {
         . = ALIGN(4);
         __bss_start__ = .;
-        *(.bss)
-        *(.bss*)
-        *(COMMON)
-        . = ALIGN(4);
+        * (.bss .bss.*)
+        * (COMMON)
         __bss_end__ = .;
     } > RAM
-
+/*
     .ARM.extab : { 
         . = ALIGN(4);
         *(.ARM.extab* .gnu.linkonce.armextab.*)
@@ -71,7 +67,7 @@ SECTIONS {
     .ARM.attributes 0 : {
         *(.ARM.attributes)
     }
-
+*/
     .stack (NOLOAD) : {
         . = ALIGN(8);
         . = . + STACK_SIZE;

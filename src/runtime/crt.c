@@ -20,9 +20,9 @@ extern int main(int argc, char **argv);
  */
 
 /* Data segment */
-extern char __etext;
-extern char __data_start__;
-extern char __data_end__;
+extern char __data_load;
+extern char __data_start;
+extern char __data_end;
 
 /* BSS segment */
 extern char __bss_start__;
@@ -49,7 +49,7 @@ void _start() {
     memset(&__bss_start__, 0, &__bss_end__ - &__bss_start__);
 
     /* initialize data segment */
-    memcpy(&__data_start__, &__etext, &__data_end__ - &__data_start__);
+    memcpy(&__data_start, &__data_load, &__data_end - &__data_start);
 
     /* run pre init and init functions */
     for (void (**f)() = &__preinit_array_start; f < &__init_array_start; f++) (*f)();

@@ -25,8 +25,8 @@ Additionally the starting address of the stack and programm start address are st
 
 Here are the first few entries of this table:
 
-    const void * _vector_table[] __attribute__ ((section(".vector"))) = {
-        &_stack_top,
+    const void * const _vector_table[] = {
+        &__stack,
         on_reset,
         on_nmi,
         on_hard_fault,
@@ -169,14 +169,10 @@ This is an extract:
     00024098 B a
     000240c0 B errno
     000240c4 B __bss_end__
-    000240c4 B __end__
-    000240c4 B _bss_end__
-    000240c4 B _end
-    000240c4 B end
     00080000 N _stack
 
 We can see that there is our `main` function and also `printf`.
-But there are much more function.
+But there are much more functions.
 For example `_start` and `_mainCRTStartup` which have the same starting address.
 `objdump` tells us more about the file:
 
@@ -185,34 +181,44 @@ For example `_start` and `_mainCRTStartup` which have the same starting address.
     EXEC_P, HAS_SYMS, D_PAGED
     start address 0x000080e4
 
-Here we see that the start address of the program is `0x000080e4`
+Here we can see that the start address of the program is `0x000080e4`
 which is exaclty the address of `_start`.
-That indicates that the entry point ot the program is `_start`.
+That indicates that the entry point of the program is `_start`.
 
-The module of `libc` responsible for the initialisation is `crt0`.
-`crt` stands for _C runtime_.
-But the standard function is not useable in an embedded environment wihtout an operating system.
-So we have to do the initialisations on our own.
-This is done in the file [crt.c](crt.c) which is named in analogy to `libc`.
-This modules implements `on_reset` and `start`.
-The later does the initialisation of the C runtime and calls main.
+`_start` is implemented by `libc`.
+But the standard function is not useable in an embedded environment:
+ 1. It does not copy the data segment form ROM to RAM.
+    That leads to uninitialized variable.
+    In our example the value of variable `b` will be undefined but not 7.
+    At least in the most cases...
+ 2. `_start` take a lot of care about the exit of the program.
+    But in an embedded environment `main` typically does not end
+    and the program does not exit.
+    Because of this `_start` introduces a lot of unnecessary code.
 
-`on_reset` is an small function:
+These are the reason why we have to do the initialisations on our own.
+This is done [crt.c](crt.c).
+First we have to implement the function `on_reset`:
 
     void on_reset() {
         system_init();
-        start();
+        _start();
         system_reset();
     }
 
- 1. It calls `system_init()` as proposed by CMSIS.
- 2. It calls `start()` which starts up the C program.
- 3. Whenever `start()` ends it does a system reset with the call of `system_reset()``
-
+It calls `system_init` to initialise the hardware as proposed by CMSIS.
+Then it calls our own `_start` function which starts up the C program.
+Whenever `main` and then `_start` ends it does a system reset with the call of `system_reset`.
 The functions `system_init()` and `system_reset` are implemented in [system.c](system.c).
-With that design we can keep `crt.c` independant from the hardware.
-It can be reused as it is for whatever hardware is used.
+With that design we can keep [crt.c](crt.c) independant from the hardware.
 
+The most simple version of `_start` is this:
+
+    void _start() {
+        main(0, NULL);
+    }
+
+But this is not sufficient because the global variables are not initialized correctly.
 To understand how we can initialise the global variables correctly
 and call constructors and destructors
 we have to take a look at what a compiler and linker does.
@@ -241,8 +247,8 @@ You can see what is included in an object or executable file with the `nm` comma
 Lets have a look what the object file of `vector_table.c` contains.
 This is the output on `nm`.
 
-             U _stack_top
-    00000000 D _vector_table
+             U _stack
+    00000000 R vector_table
     00000000 t default_handler
     00000000 W on_adc1_2
     00000000 W on_bus_fault
@@ -254,64 +260,95 @@ The first column is the address of the symbol.
 The address are all zero because the symbols are not yet located to a specific address.
 This is done in the last step by the linker.
 
-The only exeption is `_stack_top` which does not even have an address.
+The only exeption is `_stack` which does not even have an address.
 The reason for this is that this symbol is not defined in this object file.
 It is undefined and mark with `U`.
 This symbol must be defined in exaclty on other object file.
 Otherwise the linker will complain that there is an undefined symbol
 or a symbol is defined twice.
 
-`_vector_table` is defined in this object file.
-It has a address (of zero) and is mark with a `D` for `data`.
+`vector_table` is defined in this object file.
+It has a address (of zero) and is mark with a `R` for `rodata`.
 `default_handler` is also defined in that object file but with a `t` for text.
 It has a small `t` because it is `static` and not visible outside of the file.
-
 The functions like `on_adc1_2` are the weak definition.
 This definitions can be overriden by a definition in another file.
 
 So it is done with `on_reset`.
-We have defined `on_reset` in `crt.c`.
+We have defined `on_reset` in [crt.c](crt.c).
 Here is what `nm` says to this file/definition:
 
              U main
     00000000 T on_reset
-    00000000 t start
+    00000000 T _start
              U system_init
              U system_reset
 
-In the object file of `crt.c` there are two functions defined: `on_reset` and `start`.
-`on_reset` is visible outside the file. `start` is `static` and not visible.
+In the object file of [crt.c](crt.c) there are two functions defined: `on_reset` and `_start`.
 The function `main`, `system_init` and `system_reset` are undefined.
-`system_init` and `system_reset` are defined in `system.c`.
+`system_init` and `system_reset` are defined in [system.c](system.c).
 `main` must be defined by the application programmer in his application program.
 
-And finally have a look at the contents of the resulting executable file.
+So the name of all C variables and functions are stored in the object files.
+The linker brings it all together and assigns addresses to these objects.
+But the linker can do even more:
+The linker can define symbols by itself.
+This symbols can be accessed from C functions as external symbols.
+There is not destinction between symbols from the linker and symbols in other object file.
+
+When we now build our program with our own `_start` function
+we get an error from the linker:
+
+    ld: in function `_start':
+        crt.c:(.text+0x0): multiple definition of `_start'; crt0.o:(.text+0x0): first defined here
+    collect2: error: ld returned 1 exit status
+
+Now the sysbol `_start` are defined twice: Once in our file [crt.c]
+and once again in the C library file `crt0.o`.
+To get rid of this error we have to tell the linker
+that it should not use the standard start files.
+This can be done with the option `-nostartfiles`.
+With this option in place our program links to an executable file.
+
+We can now have a look in this executable file.
 Here is an extract:
 
-    08000000 T _vector_table
-    08000124 T main
-    080002a4 t start
-    08000378 T on_reset
-    0800038c t default_handler
-    0800038c W on_adc1_2
-    0800038c W on_bus_fault
-    0800038c W on_can1_rx1
-    08000458 T system_init
-    080005a8 T system_reset
-    08000628 A __etext
-    20000000 D __data_start__
-    20000000 D system_core_clock
-    20000004 D __data_end__
-    20000004 B __bss_end__
-    20000004 B __bss_start__
-    20005000 T _stack_top
+    00008000 T main
+    00008050 t default_handler
+    0000805c T _start
+    00008164 T on_reset
+    000082cc T printf
+    00012fb8 R c
+    00012fd4 R vector_table
+    00023398 D __data_start
+    00023398 D b
+    00023d44 D _edata
+    00023d44 B __bss_start__
+    00023d80 B a
+    00023da8 B errno
+    00023dac B __bss_end__
+    00080000 N _stack
 
-Now we see that the symbols really have addresses.
+First, we see that the symbols now have addresses.
+And we see that all objects and functions we defined are in the executable file.
+But there are additional symbols that we did not define.
+`__data_start`, `__bss_end__` or `_stack` for example.
+Where do these symbols come from?
+
+And we have another problem:
+The addresses of the symbols do not match to the memory layout of our controller.
+Our RAM start at address 0x20000000 and out flash memory is locatet at 0x08000000.
+How can we fix this?
 
 
-Lets have a look at the `start()` function:
+Linker Script File
+------------------
 
-    static void start() {
+
+
+Lets have a look at the `_start` function:
+
+    void _start() {
         for (int *p = &__bss_start__; p < &__bss_end__; p++) *p = 0;
         for (int *p = &__data_start__, *from = &__etext; p < &__data_end__; p++, from++) *p = *from;
 
@@ -348,4 +385,3 @@ Resources
  * https://interrupt.memfault.com/how-to-write-linker-scripts-for-firmware
  * https://interrupt.memfault.com/boostrapping-libc-with-newlib
  * https://embeddedartistry.com/blog/2019/04/17/exploring-startup-implementations-newlib-arm/
- 

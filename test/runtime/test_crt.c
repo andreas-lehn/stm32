@@ -26,7 +26,7 @@ int main(int argc, char **argv) {
     char l = buffer[2];
     char o = buffer[4];
     buffer[6] = o;
-    char * a = str;
+    const char * a = str;
     buffer[8] = l;
     buffer[9] = 0;
     buffer[7] = a[5];
