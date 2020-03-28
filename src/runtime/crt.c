@@ -57,10 +57,10 @@ static void start() {
     for (int *p = &__data_start__, *from = &__etext; p < &__data_end__; p++, from++) *p = *from;
 
     /* run pre init functions */
-    for (void (**f)() = &__preinit_array_start; f < &__preinit_array_end; f++) (*f)();
+    for (void (**f)() = &__preinit_array_start; f < &__init_array_start; f++) (*f)();
 
     /* run init functions */
-    for (void (**f)() = &__init_array_start; f < &__init_array_end; f++) (*f)();
+    for (void (**f)() = &__init_array_start; f < &__init_array_start; f++) (*f)();
 
     main(0, NULL);
 

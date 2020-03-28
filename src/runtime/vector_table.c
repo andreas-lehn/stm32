@@ -83,7 +83,7 @@ void on_usb_wakeup()      __attribute__ ((weak, alias("default_handler")));
 /*
  * Definition of the address vector.
  */
-const void * _vector_table[] __attribute__ ((section(".vector"))) = {
+const void * const vector_table[] = {
     &_stack_top,
     on_reset,
     on_nmi,
