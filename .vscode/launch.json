@@ -5,32 +5,12 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Timer Demo",
+            "name": "CMake Debug Target",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/timer-demo.elf",
-            "cwd": "${workspaceFolder}",
-            "MIMode": "gdb",
-            "miDebuggerServerAddress": "localhost:4242",
-            "miDebuggerPath": "arm-none-eabi-gdb"
-        },
-        {
-            "name": "Blinky App",
-            "type": "cppdbg",
-            "request": "launch",
-            "program": "${workspaceFolder}/build/blinky.elf",
+            "program": "${command:cmake.launchTargetPath}",
             "cwd": "${workspaceFolder}",
             // "logging": { "engineLogging": true },
-            "MIMode": "gdb",
-            "miDebuggerServerAddress": "localhost:4242",
-            "miDebuggerPath": "arm-none-eabi-gdb"
-        },
-        {
-            "name": "Servo App",
-            "type": "cppdbg",
-            "request": "launch",
-            "program": "${workspaceFolder}/build/servo.elf",
-            "cwd": "${workspaceFolder}",
             "MIMode": "gdb",
             "miDebuggerServerAddress": "localhost:4242",
             "miDebuggerPath": "arm-none-eabi-gdb"
