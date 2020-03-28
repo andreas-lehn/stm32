@@ -10,7 +10,7 @@ MEMORY {
 STACK_SIZE = 0x1000; /* 4K */
 
 /* Highest address of the user mode stack is end of RAM */
-_stack_top = ORIGIN(RAM) + LENGTH(RAM);
+__stack = ORIGIN(RAM) + LENGTH(RAM);
 
 SECTIONS {
     .text : {
@@ -32,10 +32,13 @@ SECTIONS {
 
     .rodata : {
         *(.rodata*)
+        /* The following addresses are need for __libc_init_array and __libc_finit_array */
         __preinit_array_start = .;
         KEEP (*(.preinit_array*))
+        __preinit_array_end = .;
         __init_array_start = .;
         KEEP (*(SORT(.init_array.*)))
+        __init_array_end = .;
         KEEP (*(.init_array*))
         __fini_array_start = .;
         KEEP (*(SORT(.fini_array.*)))

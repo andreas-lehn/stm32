@@ -6,7 +6,7 @@
  * Top of the stack address has to be provided by the linker.
  * It is defined in the linker script file.
  */
-extern int _stack_top;
+extern int __stack;
 
 /*
  * Default Handler for unhandled exeptions/interrupts.
@@ -84,7 +84,7 @@ void on_usb_wakeup()      __attribute__ ((weak, alias("default_handler")));
  * Definition of the address vector.
  */
 const void * const vector_table[] = {
-    &_stack_top,
+    &__stack,
     on_reset,
     on_nmi,
     on_hard_fault,

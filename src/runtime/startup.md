@@ -347,3 +347,5 @@ Resources
  * https://github.com/umanovskis/baremetal-arm
  * https://interrupt.memfault.com/how-to-write-linker-scripts-for-firmware
  * https://interrupt.memfault.com/boostrapping-libc-with-newlib
+ * https://embeddedartistry.com/blog/2019/04/17/exploring-startup-implementations-newlib-arm/
+ 

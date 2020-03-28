@@ -1,20 +1,11 @@
 /*
- * Startup the hardware and C runtime environment.
- * 
- * The startup function provided by this file can be called directly after a reset.
- * The steps performed are:
- * 
- *  1. Clear the BBS area
- *  2. Copy the data section
- *  3. Initialize the system (with a call of system_init)
- *  4. Run the preinit/init array (for C++ constructors)
- *  5. Call main
- *  6. Run the fini array (for C++ destructors)
- *  7. Reset the system (with a call of system_reset)
+ * Start a C program
  */
 
 #include <stdint.h>
 #include <stddef.h>
+#include <string.h>
+
 #include "system.h"
 
 /*
@@ -24,7 +15,8 @@
 extern int main(int argc, char **argv);
 
 /*
- * The followin addresses have to be provided by the linker and must be defined in linker script.
+ * The following addresses are provided by the linker.
+ * Names are compatible with libc.
  */
 
 /* Data segment */
@@ -45,27 +37,28 @@ extern void (*__fini_array_start)() __attribute__((weak));
 extern void (*__fini_array_end)() __attribute__((weak));
 
 /*
- * Start initialise the C runtime, calls main and does the clean-up.
- * This function is sometime also called __main oder _start
- * when it is implemented by libc or newlib.
+ * Initialise the C runtime and run main.
+ * 
+ * This function is a replacement for the _start function of libc.
+ * The libc implementation does not initialize the data segment
+ * and is much to complicated when it comes to exit
+ * which typically never happens in an embedded application.
  */
-static void start() {
+void _start() {
     /* clear BSS segment */
-    for (int *p = &__bss_start__; p < &__bss_end__; p++) *p = 0;
+    memset(&__bss_start__, 0, (&__bss_end__ - &__bss_start__));
 
     /* initialize data segment */
-    for (int *p = &__data_start__, *from = &__etext; p < &__data_end__; p++, from++) *p = *from;
+    memcpy(&__data_start__, &__etext, (&__data_end__ - &__data_start__));
 
-    /* run pre init functions */
+    /* run pre init and init functions */
     for (void (**f)() = &__preinit_array_start; f < &__init_array_start; f++) (*f)();
-
-    /* run init functions */
     for (void (**f)() = &__init_array_start; f < &__init_array_start; f++) (*f)();
-
+    
     main(0, NULL);
 
     /* run fini functions in reveser order */
-    for (void (**f)() = &__fini_array_start - 1; f >= &__fini_array_end; f--) (*f)();
+    for (void (**f)() = &__fini_array_end - 1; f >= &__fini_array_start; f--) (*f)();
 }
 
 /*
@@ -73,6 +66,6 @@ static void start() {
  */
 void on_reset() {
     system_init();
-    start();
+    _start();
     system_reset();
 }
