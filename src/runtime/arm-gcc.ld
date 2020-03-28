@@ -40,7 +40,7 @@ SECTIONS {
         * (COMMON)
         __bss_end__ = .;
     } > RAM
-/*
+
     .ARM.extab : { 
         . = ALIGN(4);
         *(.ARM.extab* .gnu.linkonce.armextab.*)
@@ -56,7 +56,7 @@ SECTIONS {
     .ARM.attributes 0 : {
         *(.ARM.attributes)
     }
-*/
+
     .stack (NOLOAD) : {
         . = ALIGN(8);
         . = . + STACK_SIZE;
