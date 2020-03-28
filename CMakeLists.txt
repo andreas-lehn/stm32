@@ -67,3 +67,19 @@ target_link_options(servo.elf PUBLIC
     -nostartfiles
     -T ${CMAKE_SOURCE_DIR}/src/runtime/arm-gcc.ld
 )
+
+add_executable(test-crt.elf
+    test/runtime/test_crt.c
+    src/runtime/crt.c
+    src/runtime/vector_table.c
+    src/runtime/system.h
+    src/runtime/system.c
+)
+
+target_compile_definitions(test-crt.elf PUBLIC STM32F103xB)
+
+target_link_options(test-crt.elf PUBLIC
+    -specs=nosys.specs
+    -nostartfiles
+    -T ${CMAKE_SOURCE_DIR}/src/runtime/arm-gcc.ld
+)
