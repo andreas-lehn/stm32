@@ -98,8 +98,8 @@ static unsigned system_pll_clock() {
         }
     }
 
-    uint32_t pll_multiplier = (RCC->CFGR & RCC_CFGR_PLLMULL >> 18) +2;
-    return pll_base * pll_multiplier;
+    uint32_t pll_multiplier = (RCC->CFGR & RCC_CFGR_PLLMULL) >> 18;
+    return pll_base * (pll_multiplier + 2);
 }
 
 /*
@@ -126,7 +126,7 @@ void system_core_clock_update()
   }
   
   /* Compute HCLK clock frequency */
-  int prescaler = RCC->CFGR & RCC_CFGR_HPRE >> 4;
+  int prescaler = (RCC->CFGR & RCC_CFGR_HPRE) >> 4;
   system_core_clock /= ahb_prescale_divisor[prescaler];  
 }
 
@@ -146,4 +146,33 @@ void system_wait_for_event() {
  */
 void system_reset() {
     __NVIC_SystemReset();
+}
+
+/*
+ * Switch clock to 72 MHz
+ */
+void system_clock_72(){
+    /* Switch to HSI */
+    RCC->CFGR &= ~3;
+
+    // Wait until the switch is done
+    while ((RCC->CFGR & 12) != 0);
+
+    // Disable the PLL, then we can configure it
+    CLEAR_BIT(RCC->CR, RCC_CR_PLLON);
+    
+    // Flash latency 2 wait states
+    MODIFY_REG(FLASH->ACR, FLASH_ACR_LATENCY, FLASH_ACR_LATENCY_1);
+
+    // 72 MHz using the 8 MHz HSE oscillator with 9x PLL, lowspeed I/O runs at 36 MHz
+    WRITE_REG(RCC->CFGR, RCC_CFGR_PLLSRC + RCC_CFGR_PLLMULL9 + RCC_CFGR_PPRE1_DIV2);
+
+    // Enable PLL
+    SET_BIT(RCC->CR, RCC_CR_PLLON);
+
+    // Wait until PLL is ready
+    while(!READ_BIT(RCC->CR, RCC_CR_PLLRDY)) {}
+
+    // Select PLL as clock source
+    MODIFY_REG(RCC->CFGR, RCC_CFGR_SW, RCC_CFGR_SW_PLL);
 }

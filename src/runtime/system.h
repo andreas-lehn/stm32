@@ -37,4 +37,9 @@ void system_tick_config(uint32_t ticks);
  */
 void system_wait_for_event();
 
+/*
+ * Switch the clock to 72 MHZ
+ */
+void system_clock_72();
+
 #endif
