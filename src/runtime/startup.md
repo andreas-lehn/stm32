@@ -197,7 +197,7 @@ But the standard function is not useable in an embedded environment:
     Because of this `_start` introduces a lot of unnecessary code.
 
 These are the reason why we have to do the initialisations on our own.
-This is done [crt.c](crt.c).
+This is done [cstart.c](cstart.c).
 First we have to implement the function `on_reset`:
 
     void on_reset() {
@@ -210,7 +210,7 @@ It calls `system_init` to initialise the hardware as proposed by CMSIS.
 Then it calls our own `_start` function which starts up the C program.
 Whenever `main` and then `_start` ends it does a system reset with the call of `system_reset`.
 The functions `system_init()` and `system_reset` are implemented in [system.c](system.c).
-With that design we can keep [crt.c](crt.c) independant from the hardware.
+With that design we can keep [cstart.c](cstart.c) independant from the hardware.
 
 The most simple version of `_start` is this:
 
@@ -275,7 +275,7 @@ The functions like `on_adc1_2` are the weak definition.
 This definitions can be overriden by a definition in another file.
 
 So it is done with `on_reset`.
-We have defined `on_reset` in [crt.c](crt.c).
+We have defined `on_reset` in [cstart.c](cstart.c).
 Here is what `nm` says to this file/definition:
 
              U main
@@ -284,7 +284,7 @@ Here is what `nm` says to this file/definition:
              U system_init
              U system_reset
 
-In the object file of [crt.c](crt.c) there are two functions defined: `on_reset` and `_start`.
+In the object file of [cstart.c](cstart.c) there are two functions defined: `on_reset` and `_start`.
 The function `main`, `system_init` and `system_reset` are undefined.
 `system_init` and `system_reset` are defined in [system.c](system.c).
 `main` must be defined by the application programmer in his application program.
@@ -300,10 +300,10 @@ When we now build our program with our own `_start` function
 we get an error from the linker:
 
     ld: in function `_start':
-        crt.c:(.text+0x0): multiple definition of `_start'; crt0.o:(.text+0x0): first defined here
+        cstart.c:(.text+0x0): multiple definition of `_start'; crt0.o:(.text+0x0): first defined here
     collect2: error: ld returned 1 exit status
 
-Now the sysbol `_start` are defined twice: Once in our file [crt.c]
+Now the sysbol `_start` are defined twice: Once in our file [cstart.c]
 and once again in the C library file `crt0.o`.
 To get rid of this error we have to tell the linker
 that it should not use the standard start files.
