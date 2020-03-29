@@ -21,6 +21,7 @@ void system_reset();
  * System core clock frequency
  */
 extern uint32_t system_core_clock;
+extern uint32_t system_apb1_clock;
 
 /*
  * Updates the system core clock
@@ -38,8 +39,22 @@ void system_tick_config(uint32_t ticks);
 void system_wait_for_event();
 
 /*
- * Switch the clock to 72 MHZ
+ * Possible clock frequencies
  */
-void system_clock_72();
+enum clock_frq {
+  CLOCK_FRQ_16_MHZ,
+  CLOCK_FRQ_24_MHZ,
+  CLOCK_FRQ_32_MHZ,
+  CLOCK_FRQ_40_MHZ,
+  CLOCK_FRQ_48_MHZ,
+  CLOCK_FRQ_56_MHZ,
+  CLOCK_FRQ_64_MHZ,
+  CLOCK_FRQ_72_MHZ
+};
+
+/*
+ * Change clock frequency
+ */
+void system_clock_frequency(enum clock_frq frq);
 
 #endif

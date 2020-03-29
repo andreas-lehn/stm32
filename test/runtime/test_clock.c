@@ -23,14 +23,33 @@ int main(int argc, char **argv)  {
     GPIOA->BSRR = 1;
     GPIOA->CRL = 0x44444446;
 
-    system_clock_72();
-    system_core_clock_update();
-    int clock = system_core_clock;
-    if (clock == 72000000) {
-        GPIOC->BRR = PIN13;
-    }
+    struct frq_entry {
+        enum clock_frq frq;
+        uint32_t clock;
+        uint32_t apb1;
+    } frq_table[] = {
+        { CLOCK_FRQ_16_MHZ, 16000000, 16000000},
+        { CLOCK_FRQ_24_MHZ, 24000000, 24000000},
+        { CLOCK_FRQ_32_MHZ, 32000000, 32000000},
+        { CLOCK_FRQ_40_MHZ, 40000000, 20000000},
+        { CLOCK_FRQ_48_MHZ, 48000000, 24000000},
+        { CLOCK_FRQ_56_MHZ, 56000000, 28000000},
+        { CLOCK_FRQ_64_MHZ, 64000000, 32000000},
+        { CLOCK_FRQ_72_MHZ, 72000000, 36000000}
+    };
 
-    GPIOA->BRR = 1;
+    int success = 1;
+    for (int i = 0; i <= CLOCK_FRQ_72_MHZ; i++) {
+        system_clock_frequency(frq_table[i].frq);
+        int clock = system_core_clock;
+        int apb1  = system_apb1_clock;
+        success = success && (clock == frq_table[i].clock) && (apb1 == frq_table[i].apb1);
+    }
+    if (success) {
+        GPIOC->BRR = PIN13;
+    } else {
+        GPIOA->BRR = 1;
+    }
 
     while(1);
 }

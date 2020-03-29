@@ -1,4 +1,4 @@
-
+#include "system.h"
 #include "stm32f1xx.h"
 #include <stdint.h>
 
@@ -7,10 +7,11 @@
 
 #define VECT_TAB_OFFSET 0 /* Vector Table base offset field. This value must be a multiple of 0x200. */
 
-unsigned system_core_clock = 8000000;
+uint32_t system_core_clock = 8000000;
+uint32_t system_apb1_clock = 8000000;
 
-const int ahb_prescale_divisor[] = {1, 1, 1, 1, 1, 1, 1, 1, 2, 4, 6, 8, 12, 14, 16, 18};
-const int apb_prescale_divisor[] =  {1, 1, 1, 1, 2, 4, 6, 8};
+static const int ahb_prescale_divisor[] = {1, 1, 1, 1, 1, 1, 1, 1, 2, 4, 6, 8, 12, 14, 16, 18};
+static const int apb_prescale_divisor[] =  {1, 1, 1, 1, 2, 4, 6, 8};
 
 /*
  * Setup the microcontroller system
@@ -38,47 +39,44 @@ const int apb_prescale_divisor[] =  {1, 1, 1, 1, 2, 4, 6, 8};
  * They are not doubled by their prescaler.
  */
 void system_init() {
-  /* The reset value of control register RCC-CR is 0x000 XX83. That means:
-   *
-   *  PLL ready        PLLRDY = No
-   *  PLL on           PLLON  = No
-   *  CSS on           CSSON  = No
-   *  HSE bypass       HSEBY  = No
-   *  HSE on           HSEON  = No
-   *  HSI calibration  HSICAL = undefined
-   *  HSI trimming    HSITRIM = 16
-   *  HSI ready       HSIRDY  = Yes
-   *  HSI on          HSION   = Yes
-   */
+    /* The reset value of control register RCC-CR is 0x000 XX83. That means:
+     *
+     *  PLL ready        PLLRDY = No
+     *  PLL on           PLLON  = No
+     *  CSS on           CSSON  = No
+     *  HSE bypass       HSEBY  = No
+     *  HSE on           HSEON  = No
+     *  HSI calibration  HSICAL = undefined
+     *  HSI trimming    HSITRIM = 16
+     *  HSI ready       HSIRDY  = Yes
+     *  HSI on          HSION   = Yes
+     */
 
-  /* Switch on HSE, PLL and Clock Security*/
-  RCC->CR |= RCC_CR_HSEON | RCC_CR_CSSON;
+    /* Switch on HSE and Clock Security*/
+    RCC->CR |= RCC_CR_HSEON | RCC_CR_CSSON;
 
-  /*
-   * The reset value of the clock configuration register is 0x0000 0000.
-   * That means:
-   * 
-   *  Micro controller clock output:    MCO = No clock
-   *  USB prescaler:                 USBPRE = Divided by 1.5
-   *  PLL multiplication factor      PLLMUL = input clock x 2
-   *  HSE divider for PLL          PLLXTPRE = not divided
-   *  PLL entry clock source         PLLSRC = HSI / 2
-   *  ADC prescaler                  ADCPRE = PCLK / 2
-   *  APB high speed prescaler        PPRE2 = HCLK not divided
-   *  APB low speed prescaler         PPRE2 = HCLK not divided
-   *  AHB prescaler                    HPRE = SYSCLK not divided
-   *  System clock switch status        SWS = HSI oscillator used
-   *  System clock switch                SW = HSI selected
-   */
+    /*
+     * The reset value of the clock configuration register is 0x0000 0000.
+     * That means:
+     * 
+     *  Micro controller clock output:    MCO = No clock
+     *  USB prescaler:                 USBPRE = Divided by 1.5
+     *  PLL multiplication factor      PLLMUL = input clock x 2
+     *  HSE divider for PLL          PLLXTPRE = not divided
+     *  PLL entry clock source         PLLSRC = HSI / 2
+     *  ADC prescaler                  ADCPRE = PCLK / 2
+     *  APB high speed prescaler        PPRE2 = HCLK not divided
+     *  APB low speed prescaler         PPRE2 = HCLK not divided
+     *  AHB prescaler                    HPRE = SYSCLK not divided
+     *  System clock switch status        SWS = HSI oscillator used
+     *  System clock switch                SW = HSI selected
+     */
 
-  /*
-   * Set the following values:
-   *     SW = HSE selected
-   */
-  RCC->CFGR |= RCC_CFGR_SW_HSE;
+    /* Set HSE as source for system clock => 8 MHz */
+    RCC->CFGR |= RCC_CFGR_SW_HSE;
 
-  /* Vector Table Relocation in Internal FLASH. */
-  SCB->VTOR = FLASH_BASE | VECT_TAB_OFFSET; 
+    /* Vector Table Relocation in Internal FLASH. */
+    SCB->VTOR = FLASH_BASE | VECT_TAB_OFFSET; 
 }
 
 /*
@@ -98,7 +96,7 @@ static unsigned system_pll_clock() {
         }
     }
 
-    uint32_t pll_multiplier = (RCC->CFGR & RCC_CFGR_PLLMULL) >> 18;
+    uint32_t pll_multiplier = (RCC->CFGR & RCC_CFGR_PLLMULL) >> RCC_CFGR_PLLMULL_Pos;
     return pll_base * (pll_multiplier + 2);
 }
 
@@ -108,26 +106,28 @@ static unsigned system_pll_clock() {
  */
 void system_core_clock_update()
 {
-  /* Get SYSCLK source */
-  switch (RCC->CFGR & RCC_CFGR_SWS)
-  {
-    case 0x00U:  /* HSI used as system clock */
-      system_core_clock = HSI_VALUE;
-      break;
-    case 0x04U:  /* HSE used as system clock */
-      system_core_clock = HSE_VALUE;
-      break;
-    case 0x08U:  /* PLL used as system clock */
-      system_core_clock = system_pll_clock();
-      break;
-    default:
-      system_core_clock = HSI_VALUE;
-      break;
-  }
-  
-  /* Compute HCLK clock frequency */
-  int prescaler = (RCC->CFGR & RCC_CFGR_HPRE) >> 4;
-  system_core_clock /= ahb_prescale_divisor[prescaler];  
+    /* Get SYSCLK source */
+    switch (RCC->CFGR & RCC_CFGR_SWS)
+    {
+        case 0x00U:  /* HSI used as system clock */
+            system_core_clock = HSI_VALUE;
+            break;
+        case 0x04U:  /* HSE used as system clock */
+            system_core_clock = HSE_VALUE;
+            break;
+        case 0x08U:  /* PLL used as system clock */
+            system_core_clock = system_pll_clock();
+            break;
+        default:
+            system_core_clock = HSI_VALUE;
+            break;
+    }
+
+    /* Compute HCLK clock frequency */
+    int prescaler = (RCC->CFGR & RCC_CFGR_HPRE) >> RCC_CFGR_HPRE_Pos;
+    system_core_clock /= ahb_prescale_divisor[prescaler];
+    prescaler = (RCC->CFGR & RCC_CFGR_PPRE1) >> RCC_CFGR_PPRE1_Pos;
+    system_apb1_clock = system_core_clock / apb_prescale_divisor[prescaler];
 }
 
 void system_tick_config(uint32_t ticks) {
@@ -149,30 +149,41 @@ void system_reset() {
 }
 
 /*
- * Switch clock to 72 MHz
+ * table of clock and flash latency parameters.
  */
-void system_clock_72(){
-    /* Switch to HSI */
-    RCC->CFGR &= ~3;
+const static struct clock_param {
+    uint32_t pllmul;
+    uint32_t ppre1;
+    uint32_t flash_latency;
+} clock_param_table[] = {
+    { RCC_CFGR_PLLMULL2, RCC_CFGR_PPRE1_DIV1, 0},
+    { RCC_CFGR_PLLMULL3, RCC_CFGR_PPRE1_DIV1, 0},
+    { RCC_CFGR_PLLMULL4, RCC_CFGR_PPRE1_DIV1, FLASH_ACR_LATENCY_0},
+    { RCC_CFGR_PLLMULL5, RCC_CFGR_PPRE1_DIV2, FLASH_ACR_LATENCY_0},
+    { RCC_CFGR_PLLMULL6, RCC_CFGR_PPRE1_DIV2, FLASH_ACR_LATENCY_0},
+    { RCC_CFGR_PLLMULL7, RCC_CFGR_PPRE1_DIV2, FLASH_ACR_LATENCY_1},
+    { RCC_CFGR_PLLMULL8, RCC_CFGR_PPRE1_DIV2, FLASH_ACR_LATENCY_1},
+    { RCC_CFGR_PLLMULL9, RCC_CFGR_PPRE1_DIV2, FLASH_ACR_LATENCY_1},
+};
 
-    // Wait until the switch is done
-    while ((RCC->CFGR & 12) != 0);
+/*
+ * Switch clock frequency
+ */
+void system_clock_frequency(enum clock_frq frq) {
+    RCC->CFGR &= ~RCC_CFGR_SW; /* switch to HSI */
+    while ((RCC->CFGR & RCC_CFGR_SWS) != 0);
 
-    // Disable the PLL, then we can configure it
-    CLEAR_BIT(RCC->CR, RCC_CR_PLLON);
+    RCC->CR &= ~RCC_CR_PLLON; /* disable PLL to change parameters */
     
-    // Flash latency 2 wait states
-    MODIFY_REG(FLASH->ACR, FLASH_ACR_LATENCY, FLASH_ACR_LATENCY_1);
+    FLASH->ACR = (FLASH->ACR & FLASH_ACR_LATENCY) | clock_param_table[frq].flash_latency;
+    RCC->CFGR = RCC_CFGR_PLLSRC 
+              | clock_param_table[frq].pllmul
+              | clock_param_table[frq].ppre1;
 
-    // 72 MHz using the 8 MHz HSE oscillator with 9x PLL, lowspeed I/O runs at 36 MHz
-    WRITE_REG(RCC->CFGR, RCC_CFGR_PLLSRC + RCC_CFGR_PLLMULL9 + RCC_CFGR_PPRE1_DIV2);
+    RCC->CR |= RCC_CR_PLLON; /* enable PLL again */
+    while(!(RCC->CR & RCC_CR_PLLRDY));
 
-    // Enable PLL
-    SET_BIT(RCC->CR, RCC_CR_PLLON);
+    RCC->CFGR |= RCC_CFGR_SW_PLL; /* switch PLL on */
 
-    // Wait until PLL is ready
-    while(!READ_BIT(RCC->CR, RCC_CR_PLLRDY)) {}
-
-    // Select PLL as clock source
-    MODIFY_REG(RCC->CFGR, RCC_CFGR_SW, RCC_CFGR_SW_PLL);
+    system_core_clock_update();
 }
