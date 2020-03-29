@@ -7,28 +7,76 @@
 
 #define VECT_TAB_OFFSET 0 /* Vector Table base offset field. This value must be a multiple of 0x200. */
 
-unsigned system_core_clock = 16000000;
+unsigned system_core_clock = 8000000;
 
 const int ahb_prescale_divisor[] = {1, 1, 1, 1, 1, 1, 1, 1, 2, 4, 6, 8, 12, 14, 16, 18};
 const int apb_prescale_divisor[] =  {1, 1, 1, 1, 2, 4, 6, 8};
 
 /*
  * Setup the microcontroller system
+ * 
+ * There are three clock sources that can be used to drive the system clock (SYSCLK):
+ *  1. HSI oscilator clock (high speed internal clock signal)
+ *  2. HSE oscilator clock (high speed external clock signal)
+ *  3. PLL clock
+ * 
+ * The system clock is used to drive the AHB frequency
+ * which can be adjusted by prescalers.
+ * The maximum frequency of AHB is 72 MHz.
+ * 
+ * The AHB frequency is used to drive the APB1 and APB2 frequency.
+ * Again these frequencies can be configured with prescalers.
+ * The maximum frequency of APB1 is 36 MHz and of APB2 it is 72 MHz.
+ * 
+ * This setup routine sets up the mirco controller to use external 8 MHz oscillator clock (HSE) 
+ * as source for the system clock.
+ * It scales this frequency up to 16 MHz.
+ * 16 MHz is also used for APB2.
+ * APB1 uses half the frequency which results in 8 MHz.
+ * 
+ * The timer frequencies are set to the hardware frequency.
+ * They are not doubled by their prescaler.
  */
 void system_init() {
-  /* Reset the RCC clock configuration to the default reset state (for debug purpose) */
-  /* Set HSION bit */
-  RCC->CR |= 0x00000001;
+  /* The reset value of control register RCC-CR is 0x000 XX83. That means:
+   *
+   *  PLL ready        PLLRDY = No
+   *  PLL on           PLLON  = No
+   *  CSS on           CSSON  = No
+   *  HSE bypass       HSEBY  = No
+   *  HSE on           HSEON  = No
+   *  HSI calibration  HSICAL = undefined
+   *  HSI trimming    HSITRIM = 16
+   *  HSI ready       HSIRDY  = Yes
+   *  HSI on          HSION   = Yes
+   */
 
-  /* Reset PLLON, CSSON, HSEBYP and HSEONand bits, keep HSERDY */
-  RCC->CR &= 0xFEF0FFFF;
+  /* Switch on HSE, PLL and Clock Security*/
+  RCC->CR |= RCC_CR_HSEON | RCC_CR_CSSON;
 
-  /* Reset PLLSRC, PLLXTPRE, PLLMUL and USBPRE/OTGFSPRE bits */
-  RCC->CFGR &= 0xF8800000;
-  
-  /* Disable all interrupts and clear pending bits  */
-  RCC->CIR = 0x009F0000;
-    
+  /*
+   * The reset value of the clock configuration register is 0x0000 0000.
+   * That means:
+   * 
+   *  Micro controller clock output:    MCO = No clock
+   *  USB prescaler:                 USBPRE = Divided by 1.5
+   *  PLL multiplication factor      PLLMUL = input clock x 2
+   *  HSE divider for PLL          PLLXTPRE = not divided
+   *  PLL entry clock source         PLLSRC = HSI / 2
+   *  ADC prescaler                  ADCPRE = PCLK / 2
+   *  APB high speed prescaler        PPRE2 = HCLK not divided
+   *  APB low speed prescaler         PPRE2 = HCLK not divided
+   *  AHB prescaler                    HPRE = SYSCLK not divided
+   *  System clock switch status        SWS = HSI oscillator used
+   *  System clock switch                SW = HSI selected
+   */
+
+  /*
+   * Set the following values:
+   *     SW = HSE selected
+   */
+  RCC->CFGR |= RCC_CFGR_SW_HSE;
+
   /* Vector Table Relocation in Internal FLASH. */
   SCB->VTOR = FLASH_BASE | VECT_TAB_OFFSET; 
 }

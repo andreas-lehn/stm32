@@ -6,7 +6,7 @@ static unsigned volatile system_beat = 0;
 /*
  * Callback of the SysTick counter increments the system beat
  */
-void on_system_tick() {
+void on_sys_tick() {
     system_beat++;
 }
 

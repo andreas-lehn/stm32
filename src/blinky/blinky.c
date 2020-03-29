@@ -8,8 +8,8 @@
 #include "board.h"
 #include "framework/hooks.h"
 
-#define STEPS_PER_SECOND 1024
-#define DUTY              800
+#define STEPS_PER_SECOND 1000
+#define DUTY              100
 
 unsigned init() {
     return STEPS_PER_SECOND;
