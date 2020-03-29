@@ -68,17 +68,33 @@ target_link_options(servo.elf PUBLIC
     -T ${CMAKE_SOURCE_DIR}/src/runtime/arm-gcc.ld
 )
 
-add_executable(test-crt-c.elf
-    test/runtime/test_crt.c
+add_executable(test-cstart.elf
+    test/runtime/test_cstart.c
     src/runtime/cstart.c
     src/runtime/vector_table.c
     src/runtime/system.h
     src/runtime/system.c
 )
 
-target_compile_definitions(test-crt-c.elf PUBLIC STM32F103xB)
+target_compile_definitions(test-cstart.elf PUBLIC STM32F103xB)
 
-target_link_options(test-crt-c.elf PUBLIC
+target_link_options(test-cstart.elf PUBLIC
+    -specs=nosys.specs
+    -nostartfiles
+    -T ${CMAKE_SOURCE_DIR}/src/runtime/arm-gcc.ld
+)
+
+add_executable(test-clock.elf
+    test/runtime/test_clock.c
+    src/runtime/vector_table.c
+    src/runtime/cstart.c
+    src/runtime/system.h
+    src/runtime/system.c
+)
+
+target_compile_definitions(test-clock.elf PUBLIC STM32F103xB)
+
+target_link_options(test-clock.elf PUBLIC
     -specs=nosys.specs
     -nostartfiles
     -T ${CMAKE_SOURCE_DIR}/src/runtime/arm-gcc.ld
