@@ -53,6 +53,7 @@ void setup()  {
      * 
      * So just have a look in this table to know what is going on...
      */
+     
 
     /*
      * On Port A
@@ -122,19 +123,19 @@ void moving_led_off() {
 }
 
 void position_0_led_on() {
-    GPIOA->BRR = PIN0;
-}
-
-void position_0_led_off() {
-    GPIOA->BSRR = PIN0;
-}
-
-void position_1_led_on() {
     GPIOA->BRR = PIN7;
 }
 
-void position_1_led_off() {
+void position_0_led_off() {
     GPIOA->BSRR = PIN7;
+}
+
+void position_1_led_on() {
+    GPIOA->BRR = PIN0;
+}
+
+void position_1_led_off() {
+    GPIOA->BSRR = PIN0;
 }
 
 int switch_position() {
