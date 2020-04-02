@@ -39,10 +39,8 @@ set(CMAKE_ASM_COMPILER ${CMAKE_C_COMPILER})
 #
 # Linker flags
 #
-set(CMAKE_LDFLAGS "-static -mfloat-abi=soft -mthumb -flto")
+set(CMAKE_LDFLAGS "-static -Wl,--gc-sections -flto")
 #    -static             # force static linking (no shared objects)
-#    -mfloat-abi=soft    
-#    -mthumb
 #    --gc-sections        # remove unused sections. Does not work unfortunately...
 #    -flto                # link time optimization
 
